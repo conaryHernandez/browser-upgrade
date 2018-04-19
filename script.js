@@ -2,26 +2,64 @@ var json = {
     "siteName": "sandals",
     "siteCode": "sndl",
     "cdnUrl": "https://www.cdn.com",
-    "browsers": [
-        {
-            name:"Chrome",
-            minimunVersion:56,
-            downloadUrl: "https://www.chrome.com"
+    "browsersBySite": {
+        "www.sandals.com": [
+            {
+                name: "Chrome",
+                minimunVersion: 58,
+                downloadUrl: "https://www.chrome.com"
+            },
+            {
+                name: "Safari",
+                minimunVersion: 10,
+                downloadUrl: "https://www.safari.com"
+            },
+        ],
+        "www.beaches.com": [
+            {
+                name: "Chrome",
+                minimunVersion: 56,
+                downloadUrl: "https://www.chrome.com"
+            },
+            {
+                name: "Safari",
+                minimunVersion: 9,
+                downloadUrl: "https://www.safari.com"
+            },
+        ],
+        "sandalsselect.com": [
+            {
+                name: "Chrome",
+                minimunVersion: 58,
+                downloadUrl: "https://www.chrome.com"
+            },
+            {
+                name: "Safari",
+                minimunVersion: 10,
+                downloadUrl: "https://www.safari.com"
+            },
+            {
+                name: "Firefox",
+                minimunVersion: 10,
+                downloadUrl: "https://www.safari.com"
+            },
+        ]
+    },
+    "modalContent": {
+        sandals:{
+            "icon":"icon-sandals",
+            "text": "Your sandals app"
         },
-        {
-            name:"Safari",
-            minimunVersion:56,
-            downloadUrl: "https://www.safari.com"
+        beaches: {
+            "icon":"icon-beaches",
+            "text": "Your beaches app"
         },
-        {
-            name:"Firefox",
-            minimunVersion:56,
-            downloadUrl: "https://www.firefox.com"
+        ssg: {
+            "icon":"icon-ssg",
+            "text": "Your ssg app"
         }
-    ]
+    },
 }
-
-console.log(json);
 
 navigator.myBrowser= (function(){
     var ua= navigator.userAgent, tem,
@@ -42,14 +80,16 @@ navigator.myBrowser= (function(){
 var browser = navigator.myBrowser;
 var browserName = browser.match(/[a-zA-Z]+/g);
 var browserVersion = parseInt(browser.match(/\d+/)[0]);
-
-var lengthBrowsers = json.browsers.length;
+var siteName = window.location.hostname !== "" ? window.location.hostname : console.log('the browser script is not working probably because you are in a local server');
+var lengthBrowsers = json.browsersBySite[siteName] ? json.browsersBySite[siteName].length : 0;
 
 function validateBrowser() {
-    for (var y = 0; y < lengthBrowsers ; y ++){
-        if(browserName[0] === json.browsers[y].name) {
+
+    for (var x = 0; x < lengthBrowsers; x++ ) {
+        if (browserName[0] === json.browsersBySite[siteName][x].name) {
             console.log("existe");
-            if( browserVersion < json.browsers[y].minimunVersion) {
+
+            if (browserVersion < json.browsersBySite[siteName][x].minimunVersion) {
                 console.log("version desactualizada");
                 createModalBox();
             }
@@ -59,23 +99,36 @@ function validateBrowser() {
 
 function createModalBox() {
     var modalwrapper = document.createElement('div');
-    var modalIcon = document.createElement('i');
+    var modal = document.createElement('div');
     var body = document.querySelector('body');
+    var modalItems = json.modalContent.length;
+    /* Default styles for modal*/
+    modal.style.position = 'fixed';
+    modal.style.backgroundColor = "black";
+    modal.style.opacity = '0.5';
+    modal.style.width = "100%";
+    modal.style.height = "100%";
+    modal.style.top = "0";
 
-    //Classes
     modalwrapper.classList.add('browser-upgrade');
-    modalIcon.classList.add('icon-sandals'); //icon sandals debe venir de JSON
-
-    //styles
-    /* TODOS ESTOS ESTILOS DEBEN VENIR DE UN JSON*/
     modalwrapper.style.position = 'absolute';
     modalwrapper.style.backgroundColor = "red";
     modalwrapper.style.width = "300px";
     modalwrapper.style.height = "300px";
-    modalwrapper.style.margin = "auto";
 
    //Childs
-   modalwrapper.appendChild(modalIcon);
-   body.appendChild(modalwrapper);
+   modal.appendChild(modalwrapper);
+   body.appendChild(modal);
+
+    var pageWidth = document.getElementsByClassName('browser-upgrade')[0].offsetWidth;
+    var pageHeight = window.innerHeight;
+    var halfMiddle = pageWidth / 2;
+    var halfTop = pageHeight / 2;
+
+    modalwrapper.style.top = "50%";
+    modalwrapper.style.marginTop = "-" + (halfTop / 2 ) + "px";
+    modalwrapper.style.left = "50%";
+    modalwrapper.style.marginLeft = "-" + halfMiddle + "px";
+
 }
 
