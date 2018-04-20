@@ -6,41 +6,41 @@ var json = {
         "www.sandals.com": [
             {
                 name: "Chrome",
-                minimunVersion: 58,
+                minVersionSupported: 58,
                 downloadUrl: "https://www.chrome.com"
             },
             {
                 name: "Safari",
-                minimunVersion: 10,
+                minVersionSupported: 10,
                 downloadUrl: "https://www.safari.com"
             },
         ],
         "www.beaches.com": [
             {
                 name: "Chrome",
-                minimunVersion: 56,
+                minVersionSupported: 56,
                 downloadUrl: "https://www.chrome.com"
             },
             {
                 name: "Safari",
-                minimunVersion: 9,
+                minVersionSupported: 9,
                 downloadUrl: "https://www.safari.com"
             },
         ],
         "sandalsselect.com": [
             {
                 name: "Chrome",
-                minimunVersion: 58,
+                minVersionSupported: 58,
                 downloadUrl: "https://www.chrome.com"
             },
             {
                 name: "Safari",
-                minimunVersion: 10,
+                minVersionSupported: 10,
                 downloadUrl: "https://www.safari.com"
             },
             {
                 name: "Firefox",
-                minimunVersion: 10,
+                minVersionSupported: 10,
                 downloadUrl: "https://www.safari.com"
             },
         ]
@@ -48,15 +48,18 @@ var json = {
     "modalContent": {
         sandals:{
             "icon":"icon-sandals",
-            "text": "Your sandals app"
+            "text": "This website is designed using new technology and best practices",
+            "highlightText": "We recommend upgrading your browser"
         },
         beaches: {
             "icon":"icon-beaches",
-            "text": "Your beaches app"
+            "text": "This website is designed using new technology and best practices",
+            "highlightText": "We recommend upgrading your browser"
         },
         ssg: {
             "icon":"icon-ssg",
-            "text": "Your ssg app"
+            "text": "This website is designed using new technology and best practices",
+            "highlightText": "We recommend upgrading your browser"
         }
     },
 }
@@ -82,6 +85,7 @@ var browserName = browser.match(/[a-zA-Z]+/g);
 var browserVersion = parseInt(browser.match(/\d+/)[0]);
 var siteName = window.location.hostname !== "" ? window.location.hostname : console.log('the browser script is not working probably because you are in a local server');
 var lengthBrowsers = json.browsersBySite[siteName] ? json.browsersBySite[siteName].length : 0;
+var body = document.querySelector('body');
 
 function validateBrowser() {
 
@@ -89,7 +93,7 @@ function validateBrowser() {
         if (browserName[0] === json.browsersBySite[siteName][x].name) {
             console.log("existe");
 
-            if (browserVersion < json.browsersBySite[siteName][x].minimunVersion) {
+            if (browserVersion < json.browsersBySite[siteName][x].minVersionSupported) {
                 console.log("version desactualizada");
                 createModalBox();
             }
@@ -98,37 +102,102 @@ function validateBrowser() {
 }
 
 function createModalBox() {
-    var modalwrapper = document.createElement('div');
+    var modalWrapper = document.createElement('div');
     var modal = document.createElement('div');
-    var body = document.querySelector('body');
     var modalItems = json.modalContent.length;
+    var pageWidth;
+    var pageHeight;
+    var halfMiddle;
+    var halfTop;
+
     /* Default styles for modal*/
+    body.style.overflow= "hidden";
+
+    modal.classList.add('browser-modal');
     modal.style.position = 'fixed';
     modal.style.backgroundColor = "black";
     modal.style.opacity = '0.5';
     modal.style.width = "100%";
     modal.style.height = "100%";
     modal.style.top = "0";
+    modal.style.zIndex = "9998";
 
-    modalwrapper.classList.add('browser-upgrade');
-    modalwrapper.style.position = 'absolute';
-    modalwrapper.style.backgroundColor = "red";
-    modalwrapper.style.width = "300px";
-    modalwrapper.style.height = "300px";
+    modalWrapper.classList.add('browser-upgrade');
+    modalWrapper.style.position = 'absolute';
+    modalWrapper.style.backgroundColor = "white";
+    modalWrapper.style.backgroundImage = "url(/assets/img/global//page-bg-repeat-compressor.gif) center top repeat;";
+    modalWrapper.style.width = "582px";
+    modalWrapper.style.height = "252px";
+    modalWrapper.style.zIndex = "9999";
 
-   //Childs
-   modal.appendChild(modalwrapper);
-   body.appendChild(modal);
+    body.appendChild(modal);
+    body.appendChild(modalWrapper);
 
-    var pageWidth = document.getElementsByClassName('browser-upgrade')[0].offsetWidth;
-    var pageHeight = window.innerHeight;
-    var halfMiddle = pageWidth / 2;
-    var halfTop = pageHeight / 2;
+    pageWidth = document.getElementsByClassName('browser-upgrade')[0].offsetWidth;
+    pageHeight = document.body.clientHeight;;
+    halfMiddle = pageWidth / 2;
+    halfTop = pageHeight / 2;
 
-    modalwrapper.style.top = "50%";
-    modalwrapper.style.marginTop = "-" + (halfTop / 2 ) + "px";
-    modalwrapper.style.left = "50%";
-    modalwrapper.style.marginLeft = "-" + halfMiddle + "px";
+    modalWrapper.style.top = "50%";
+    modalWrapper.style.marginTop = "-" + (halfTop / 2 ) + "px";
+    modalWrapper.style.left = "50%";
+    modalWrapper.style.marginLeft = "-" + halfMiddle + "px";
 
+    function closeModal() {
+        body.style.overflow= "scroll";
+        body.removeChild(modal);
+        body.removeChild(modalWrapper);
+        removeEvent("click", modal, closeModal );
+    }
+
+    function auxClose(e) {
+        if (e.keyCode == 27) {
+            body.removeChild(modal);
+            body.removeChild(modalWrapper);
+            body.style.overflow= "scroll";
+            removeEvent("keydown", document, auxClose );
+        }
+    }
+
+    addEvent("click", modal, closeModal );
+    addEvent("keydown", document, auxClose );
 }
+
+function addEvent(event, element, func) {
+  if (element.addEventListener) {
+        element.addEventListener(event, func, false);
+   } else if (elem.attachEvent) {
+        element.attachEvent("on" + event, func);
+   }
+}
+
+function removeEvent(event, element, func) {
+    if (element.removeEventListener) {
+        element.removeEventListener(event, func);
+    } else if (element.detachEvent) {
+        element.detachEvent(event, func);
+    }
+}
+
+addEvent("load", document, validateBrowser() );
+
+
+/*estilos de modal
+background gradient
+background fallback
+opacidad  ****
+event listener o attach ****
+no scroll  *****
+cerrar  modal y poder scrolear  *****
+cerrar modal dando clic afuera o en X ****
+cerrar modal con esc
+generar text y icono
+acortar hostname a solo domain name
+arreglar json
+*/
+
+/*falta
+agregar cookie
+agregar request de json
+*/
 
