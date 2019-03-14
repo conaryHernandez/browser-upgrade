@@ -7,3 +7,5 @@ Cool modal to tell the user if his browser is old
 -Chrome < 30
 -Firefox < 33
 -Edge < 18
+
+/*WORK IN PROGRESS*/
